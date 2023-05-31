@@ -62,24 +62,19 @@ class StartFrame(wx.Frame):
         modules_frame = ModulesFrame(self)
         modules_frame.Show()
 
-
-    def on_students(self, event):
-        pass
-
     def on_rating(self, event):
         with open(self.file_path, "rb") as file:
-            ratings = {}
             tables = pickle.load(file)
+        grades = {}
         for module in tables:
-            module_rating = [[arr[0], arr[-1]] for arr in tables[module][0]]
-            for person_rating in module_rating:
-                if person_rating[0] in ratings:
-                    ratings[person_rating[0]].append(person_rating[1])
+            module_grades = [arr[:-1] for arr in tables[module][0]]
+            for person_rating in module_grades:
+                if person_rating[0] in grades:
+                    grades[person_rating[0]].extend(person_rating[1:])
                 else:
-                    ratings[person_rating[0]] = [person_rating[1]]
-        for name in ratings:
-            ratings[name] = sum(ratings[name])/len(ratings[name])
-        rating_list = [[name, score] for name, score in ratings.items()]
+                    grades[person_rating[0]] = person_rating[1:]
+        print(grades)
+        rating_list = [[name, sum(arr_grades)/len(arr_grades), len(list(filter(lambda x: x<=2, arr_grades)))] for name, arr_grades in grades.items()]
         rating_list.sort(key=lambda x: x[1], reverse=True)
 
         rating_frame = RatingWindow(self, rating_list)
