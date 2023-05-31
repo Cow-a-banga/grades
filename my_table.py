@@ -6,18 +6,17 @@ import pickle
 class MyModel(wx.grid.GridTableBase):
     def __init__(self, table_name, file_path):
         wx.grid.GridTableBase.__init__(self)
-        self.table_name = table_name  # Имя таблицы
-        self.file_path = file_path  # Имя таблицы
-        self.data = []  # Пустой список для данных
-        self.col_names = []  # Список для названий столбцов
-        self.load_data()  # Загрузить данные из файла
+        self.table_name = table_name
+        self.file_path = file_path
+        self.data = []
+        self.col_names = []
+        self.load_data()
 
     def get_average(self, row):
         segment = row[1:-1]
         return 0 if len(segment) == 0 else sum(segment) / len(segment)
 
     def update_average(self):
-        # Добавить столбец среднего значения для каждой строки
         for row in self.data:
             row[-1] = self.get_average(row)
 
@@ -31,10 +30,9 @@ class MyModel(wx.grid.GridTableBase):
         return self.data[row][col]
 
     def SetValue(self, row, col, value):
-        # Изменить значение ячейки и обновить среднее
-        if col == 0:  # Если это столбец с именем
-            self.data[row][col] = value  # Просто изменить значение
-        else:  # Если это столбец с оценкой
+        if col == 0:
+            self.data[row][col] = value
+        else:
             try:
                 value = int(value)
                 if 0 <= value <= 5:
@@ -49,14 +47,12 @@ class MyModel(wx.grid.GridTableBase):
         return self.col_names[col]
 
     def AppendRows(self, numRows=1):
-        # Добавить новую строку с нулевыми значениями и обновить среднее
         for i in range(numRows):
             self.data.append([""] + [0] * (len(self.col_names) - 1))
             self.update_average()
         return True
 
     def AppendCols(self, numCols=1):
-        # Добавить новый столбец с нулевыми значениями и запрашивать имя столбца
         for i in range(numCols):
             name = wx.GetTextFromUser("Введите имя столбца:", "Новый столбец")
             if name:
@@ -69,7 +65,6 @@ class MyModel(wx.grid.GridTableBase):
         return True
 
     def DeleteRows(self, pos=0, numRows=1):
-        # Удалить строку и обновить среднее
         for i in range(numRows):
             if pos < len(self.data):
                 self.data.pop(pos)
@@ -78,26 +73,24 @@ class MyModel(wx.grid.GridTableBase):
         return True
 
     def DeleteCols(self, pos=0, numCols=1):
-        # Удалить столбец и обновить среднее
         for i in range(numCols):
-            if pos < len(self.col_names) - 2:  # Не удалять столбец с именем или средним
-                self.col_names.pop(pos + 1)  # Сдвинуть индекс на один из-за столбца с именем
+            if pos < len(self.col_names) - 2:
+                self.col_names.pop(pos + 1)
                 for row in self.data:
-                    row.pop(pos + 1)  # Сдвинуть индекс на один из-за столбца с именем
+                    row.pop(pos + 1)
                     row[-1] = sum(row[1:-1]) / len(row[1:-1])
             else:
                 return False
         return True
 
     def load_data(self):
-        # Загрузить данные из файла по имени таблицы
         try:
             with open(self.file_path, "rb") as file:
-                tables = pickle.load(file)  # Словарь с данными таблиц
-                if self.table_name in tables:  # Если есть данные для этой таблицы
-                    table = tables[self.table_name]  # Кортеж из двух списков: данных и названий столбцов
-                    self.data = table[0]  # Загрузить данные в модель
-                    self.col_names = table[1]  # Загрузить названия в модель
+                tables = pickle.load(file)
+                if self.table_name in tables:
+                    table = tables[self.table_name]
+                    self.data = table[0]
+                    self.col_names = table[1]
                     print(f"Данные для таблицы {self.table_name} загружены из файла")
                 else:
                     self.data = [[""]]
@@ -106,14 +99,13 @@ class MyModel(wx.grid.GridTableBase):
             print("Файл с данными не найден")
 
     def save_data(self):
-        # Сохранить данные в файл по имени таблицы
         try:
             with open(self.file_path, "rb") as file:
-                tables = pickle.load(file)  # Словарь с данными таблиц
+                tables = pickle.load(file)
         except FileNotFoundError:
-            tables = {}  # Создать новый словарь, если файл не найден
-        table = (self.data, self.col_names)  # Кортеж из двух списков: данных и названий столбцов
-        tables[self.table_name] = table  # Сохранить данные для этой таблицы
+            tables = {}
+        table = (self.data, self.col_names)
+        tables[self.table_name] = table
         with open(self.file_path, "wb") as file:
-            pickle.dump(tables, file)  # Записать словарь в файл
+            pickle.dump(tables, file)
         print(f"Данные для таблицы {self.table_name} сохранены в файл")

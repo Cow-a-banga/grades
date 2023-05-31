@@ -11,7 +11,6 @@ class MyFrame(wx.Frame):
         self.table = wx.grid.Grid(self)
         self.table.SetTable(self.model)
 
-        # Создать кнопки для добавления и удаления строк и столбцов
         self.add_row_button = wx.Button(self, label="Добавить строку")
         self.add_row_button.Bind(wx.EVT_BUTTON, self.on_add_row)
         self.add_col_button = wx.Button(self, label="Добавить столбец")
@@ -21,11 +20,9 @@ class MyFrame(wx.Frame):
         self.delete_col_button = wx.Button(self, label="Удалить столбец")
         self.delete_col_button.Bind(wx.EVT_BUTTON, self.on_delete_col)
 
-        # Добавить кнопку для сохранения данных в файл
         self.save_button = wx.Button(self, label="Сохранить")
         self.save_button.Bind(wx.EVT_BUTTON, self.on_save)
 
-        # Расположить кнопки в строку
         self.button_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.button_sizer.Add(self.add_row_button, 0, wx.ALL, 5)
         self.button_sizer.Add(self.add_col_button, 0, wx.ALL, 5)
@@ -33,7 +30,6 @@ class MyFrame(wx.Frame):
         self.button_sizer.Add(self.delete_col_button, 0, wx.ALL, 5)
         self.button_sizer.Add(self.save_button, 0, wx.ALL, 5)
 
-        # Расположить таблицу и кнопки в столбец
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.sizer.Add(self.table, 1, wx.EXPAND)
         self.sizer.Add(self.button_sizer, 0, wx.ALIGN_CENTER)
@@ -44,7 +40,6 @@ class MyFrame(wx.Frame):
         print("Добавление строки")
         if self.model.AppendRows():
             print("Модель обновлена:", self.model.data)
-            # Обновить представление таблицы
             msg = wx.grid.GridTableMessage(
                 self.model,
                 wx.grid.GRIDTABLE_NOTIFY_ROWS_APPENDED,
@@ -55,7 +50,6 @@ class MyFrame(wx.Frame):
         print("Добавление столбца")
         if self.model.AppendCols():
             print("Модель обновлена:", self.model.data)
-            # Обновить представление таблицы
             msg = wx.grid.GridTableMessage(
                 self.model,
                 wx.grid.GRIDTABLE_NOTIFY_COLS_APPENDED,
@@ -68,7 +62,6 @@ class MyFrame(wx.Frame):
         row = max(0, self.table.GetGridCursorRow())
         if self.model.DeleteRows(row):
             print("Модель обновлена:", self.model.data)
-            # Обновить представление таблицы
             msg = wx.grid.GridTableMessage(
                 self.model,
                 wx.grid.GRIDTABLE_NOTIFY_ROWS_DELETED,
@@ -83,7 +76,6 @@ class MyFrame(wx.Frame):
         if col < len(self.model.data[0]) - 1:
             if self.model.DeleteCols(col):
                 print("Модель обновлена:", self.model.data)
-                # Обновить представление таблицы
                 msg = wx.grid.GridTableMessage(
                     self.model,
                     wx.grid.GRIDTABLE_NOTIFY_COLS_DELETED,
@@ -94,4 +86,4 @@ class MyFrame(wx.Frame):
 
     def on_save(self, event):
         print("Сохранение данных в файл")
-        self.model.save_data() # Вызвать метод модели для сохранения данных
+        self.model.save_data()
